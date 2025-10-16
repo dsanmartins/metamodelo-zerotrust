@@ -1,0 +1,493 @@
+model:
+  qas:
+  - id: QA.AUDIT
+    name: Auditability
+    description: Ability to record, trace, and verify security-relevant events.
+    source: ISO/IEC 25010
+  - id: QA.INTEGRITY
+    name: Integrity
+    description: Protection against unauthorized data modification or destruction.
+    source: ISO/IEC 25010
+  - id: QA.AVAIL
+    name: Availability
+    description: Capability to remain operational under faults or attacks.
+    source: ISO/IEC 25010
+  - id: QA.CONF
+    name: Confidentiality
+    description: Prevention of unauthorized information disclosure.
+    source: ISO/IEC 25010
+  asrs:
+  - id: ASR.1
+    name: Immutable audit of financial operations
+    description: The system must generate immutable audit logs for all payment operations.
+    qa_ref: QA.AUDIT
+  - id: ASR.2
+    name: Detect unauthorized data changes
+    description: The system must detect and prevent unauthorized modifications to sensitive records.
+    qa_ref: QA.INTEGRITY
+  - id: ASR.3
+    name: Sustain service under malicious traffic
+    description: The platform must continue operating during hostile or anomalous traffic spikes.
+    qa_ref: QA.AVAIL
+  - id: ASR.4
+    name: Restrict access to confidential data
+    description: Only strongly authenticated and authorized entities may access protected datasets.
+    qa_ref: QA.CONF
+  principles:
+  - id: ZT.CMON
+    name: Continuous Monitoring
+    reference: NIST SP 800-207
+    description: Continuously assess security posture and events.
+  - id: ZT.LP
+    name: Least Privilege
+    reference: NIST SP 800-207
+    description: Limit access to the minimal set of permissions.
+  - id: ZT.EV
+    name: Explicit Verification
+    reference: NIST SP 800-207
+    description: Always verify identities, devices, and context before granting access.
+  - id: ZT.AB
+    name: Assume Breach
+    reference: NIST SP 800-207
+    description: Design and operate as if an intrusion may already exist.
+  - id: ZT.MS
+    name: Micro-Segmentation
+    reference: NIST SP 800-207
+    description: Isolate resources and flows to minimize blast radius.
+  - id: ZT.CPA
+    name: Continuous Posture Assessment
+    reference: NIST SP 800-207
+    description: Continuously validate device and workload posture.
+  - id: ZT.SI
+    name: Strong Identity
+    reference: NIST SP 800-207
+    description: Use strong, phishing-resistant identity for people and services.
+  influences:
+  - principle_ref: ZT.CMON
+    qa_ref: QA.AUDIT
+    polarity: '++'
+    rationale: Continuous monitoring directly reinforces auditability by ensuring visibility and event recording.
+  - principle_ref: ZT.CMON
+    qa_ref: QA.AVAIL
+    polarity: '+'
+    rationale: Monitoring supports early anomaly detection that helps maintain system availability.
+  - principle_ref: ZT.LP
+    qa_ref: QA.CONF
+    polarity: '++'
+    rationale: Limiting access reduces the exposure of confidential information.
+  - principle_ref: ZT.LP
+    qa_ref: QA.AVAIL
+    polarity: '+'
+    rationale: Minimizing access can improve availability by reducing attack surfaces.
+  - principle_ref: ZT.LP
+    qa_ref: QA.INTEGRITY
+    polarity: '+'
+    rationale: Restricting permissions lowers the risk of unintended data modification.
+  - principle_ref: ZT.EV
+    qa_ref: QA.CONF
+    polarity: '++'
+    rationale: Continuous identity and context verification directly protects confidentiality.
+  - principle_ref: ZT.EV
+    qa_ref: QA.INTEGRITY
+    polarity: '++'
+    rationale: Explicit verification ensures that only trusted entities modify data.
+  - principle_ref: ZT.EV
+    qa_ref: QA.AUDIT
+    polarity: '+'
+    rationale: Verification provides traceable evidence useful for auditing.
+  - principle_ref: ZT.AB
+    qa_ref: QA.AVAIL
+    polarity: '++'
+    rationale: Designing under the assumption of compromise drives architectural resilience and system continuity.
+  - principle_ref: ZT.AB
+    qa_ref: QA.CONF
+    polarity: '+'
+    rationale: Containment strategies under 'assume breach' indirectly enhance confidentiality.
+  - principle_ref: ZT.MS
+    qa_ref: QA.AVAIL
+    polarity: '++'
+    rationale: Segmentation prevents lateral movement, maintaining service availability.
+  - principle_ref: ZT.MS
+    qa_ref: QA.CONF
+    polarity: '+'
+    rationale: Segmentation confines access to authorized segments, reducing exposure of sensitive data.
+  - principle_ref: ZT.CPA
+    qa_ref: QA.INTEGRITY
+    polarity: '++'
+    rationale: Continuous posture assessment ensures system components maintain trusted configurations.
+  - principle_ref: ZT.CPA
+    qa_ref: QA.AUDIT
+    polarity: '+'
+    rationale: Posture assessment contributes to auditability by generating verifiable compliance evidence.
+  - principle_ref: ZT.SI
+    qa_ref: QA.CONF
+    polarity: '++'
+    rationale: Strong, phishing-resistant identities directly ensure confidentiality of protected assets.
+  - principle_ref: ZT.SI
+    qa_ref: QA.AUDIT
+    polarity: '+'
+    rationale: Strong identity provides reliable attribution of actions, supporting audit trails.
+  scenarios:
+  - id: SA.1
+    qa_ref: QA.AUDIT
+    principles_ref:
+    - ZT.CMON
+    - ZT.EV
+    goal: End-to-end traceability for payment events.
+    context: University payments platform in a multi-tenant environment.
+    actors:
+    - EndUser
+    - PaymentService
+    - MonitoringSubsystem
+    resources:
+    - ImmutableLogStore
+    - KMS
+    - LoggingPipeline
+    response: Produce immutable logs for all relevant events; ensure verifiable evidence.
+    keywords:
+    - audit
+    - traceability
+    - payments
+    priority:
+      importance: 5
+      difficulty: 3
+  - id: SA.2
+    qa_ref: QA.INTEGRITY
+    principles_ref:
+    - ZT.EV
+    - ZT.CPA
+    goal: Prevent and detect unauthorized data changes in transit.
+    context: Microservices exchanging sensitive academic records.
+    actors:
+    - RecordService
+    - Gateway
+    - Verifier
+    resources:
+    - ServiceMesh
+    - PKI
+    - WAF
+    response: Authenticate services and sign/verify messages.
+    keywords:
+    - integrity
+    - mTLS
+    - signing
+    priority:
+      importance: 5
+      difficulty: 4
+  - id: SA.3
+    qa_ref: QA.AVAIL
+    principles_ref:
+    - ZT.AB
+    - ZT.MS
+    goal: Maintain service availability under malicious traffic.
+    context: Public APIs exposed to the Internet.
+    actors:
+    - APIConsumer
+    - APIGateway
+    - ObservabilityStack
+    resources:
+    - Gateway
+    - Autoscaling
+    - Segmentation
+    response: Isolate blast radius and keep critical services responsive.
+    keywords:
+    - availability
+    - segmentation
+    - resilience
+    priority:
+      importance: 5
+      difficulty: 4
+  - id: SA.4
+    qa_ref: QA.CONF
+    principles_ref:
+    - ZT.LP
+    - ZT.EV
+    - ZT.SI
+    goal: Control access to confidential research data.
+    context: Analytics workloads over sensitive datasets.
+    actors:
+    - Researcher
+    - IDP
+    - DataService
+    resources:
+    - IAM
+    - KMS
+    - OPA
+    response: Strongly authenticate and enforce least privilege policies.
+    keywords:
+    - confidentiality
+    - MFA
+    - ABAC
+    - OPA
+    priority:
+      importance: 5
+      difficulty: 3
+  catalog:
+    tactics:
+    - id: TAC.AUDITTRAIL
+      name: MaintainAuditTrail
+      category: audit
+      description: Generate tamper-evident, immutable logs for critical events.
+      addresses:
+      - QA.AUDIT
+      implements_principles:
+      - ZT.CMON
+      - ZT.EV
+    - id: TAC.NONREP
+      name: NonRepudiation
+      category: integrity
+      description: Digitally sign events/transactions to prevent denial of authorship.
+      addresses:
+      - QA.INTEGRITY
+      - QA.AUDIT
+      implements_principles:
+      - ZT.EV
+    - id: TAC.MFA
+      name: MultiFactorAuthentication
+      category: access-control
+      description: Require multiple independent factors for user access.
+      addresses:
+      - QA.CONF
+      implements_principles:
+      - ZT.EV
+      - ZT.SI
+    - id: TAC.AC
+      name: AccessControlPolicy
+      category: access-control
+      description: Enforce ABAC/RBAC policies to minimize permissions.
+      addresses:
+      - QA.CONF
+      - QA.AVAIL
+      implements_principles:
+      - ZT.LP
+      - ZT.EV
+    - id: TAC.SEG
+      name: NetworkSegmentation
+      category: availability
+      description: Segment networks and workloads to contain incidents.
+      addresses:
+      - QA.AVAIL
+      - QA.CONF
+      implements_principles:
+      - ZT.MS
+      - ZT.AB
+    - id: TAC.ATREST
+      name: EncryptionAtRest
+      category: confidentiality
+      description: Encrypt data at rest with managed keys.
+      addresses:
+      - QA.CONF
+      - QA.INTEGRITY
+      implements_principles:
+      - ZT.EV
+    - id: TAC.MTLS
+      name: MutualTLS
+      category: integrity
+      description: Use mTLS for service-to-service authentication and channel protection.
+      addresses:
+      - QA.INTEGRITY
+      - QA.CONF
+      implements_principles:
+      - ZT.EV
+    - id: TAC.OPA
+      name: PolicyAsCodeOPA
+      category: governance
+      description: Centralize fine-grained authorization and compliance as code (Rego).
+      addresses:
+      - QA.AUDIT
+      - QA.CONF
+      implements_principles:
+      - ZT.EV
+      - ZT.LP
+    - id: TAC.CPAMON
+      name: ContinuousPostureMonitoring
+      category: monitoring
+      description: Continuously verify device/workload posture and drift.
+      addresses:
+      - QA.AUDIT
+      - QA.INTEGRITY
+      - QA.AVAIL
+      implements_principles:
+      - ZT.CMON
+      - ZT.CPA
+  candidates:
+  - tactic_ref: TAC.AUDITTRAIL
+    scenario_ref: SA.1
+    matched_keywords:
+    - audit
+    - traceability
+    score: 0.94
+  - tactic_ref: TAC.NONREP
+    scenario_ref: SA.1
+    matched_keywords:
+    - verifiable
+    - payments
+    - signature
+    score: 0.88
+  - tactic_ref: TAC.OPA
+    scenario_ref: SA.1
+    matched_keywords:
+    - policy
+    - evidence
+    score: 0.76
+  - tactic_ref: TAC.CPAMON
+    scenario_ref: SA.1
+    matched_keywords:
+    - continuous
+    - monitoring
+    score: 0.71
+  - tactic_ref: TAC.MTLS
+    scenario_ref: SA.2
+    matched_keywords:
+    - mTLS
+    - service-to-service
+    score: 0.95
+  - tactic_ref: TAC.NONREP
+    scenario_ref: SA.2
+    matched_keywords:
+    - sign
+    - verify
+    score: 0.89
+  - tactic_ref: TAC.ATREST
+    scenario_ref: SA.2
+    matched_keywords:
+    - encryption
+    - data
+    score: 0.7
+  - tactic_ref: TAC.CPAMON
+    scenario_ref: SA.2
+    matched_keywords:
+    - posture
+    - drift
+    score: 0.68
+  - tactic_ref: TAC.SEG
+    scenario_ref: SA.3
+    matched_keywords:
+    - segmentation
+    - blast-radius
+    score: 0.92
+  - tactic_ref: TAC.AC
+    scenario_ref: SA.3
+    matched_keywords:
+    - policy
+    - abuse-control
+    score: 0.72
+  - tactic_ref: TAC.CPAMON
+    scenario_ref: SA.3
+    matched_keywords:
+    - continuous
+    - monitoring
+    score: 0.66
+  - tactic_ref: TAC.MFA
+    scenario_ref: SA.4
+    matched_keywords:
+    - strong identity
+    - mfa
+    score: 0.96
+  - tactic_ref: TAC.AC
+    scenario_ref: SA.4
+    matched_keywords:
+    - least privilege
+    - abac
+    - rbac
+    score: 0.9
+  - tactic_ref: TAC.OPA
+    scenario_ref: SA.4
+    matched_keywords:
+    - policy-as-code
+    - opa
+    score: 0.82
+  - tactic_ref: TAC.ATREST
+    scenario_ref: SA.4
+    matched_keywords:
+    - kms
+    - encryption
+    score: 0.74
+  decisions:
+  - scenario_ref: SA.1
+    selected_tactics:
+    - TAC.AUDITTRAIL
+    - TAC.NONREP
+    - TAC.OPA
+    rationale: Traceability requires immutable logs and signed events; central policy improves audit evidence.
+  - scenario_ref: SA.2
+    selected_tactics:
+    - TAC.MTLS
+    - TAC.NONREP
+    rationale: mTLS authenticates services; signatures ensure message integrity and non-repudiation.
+  - scenario_ref: SA.3
+    selected_tactics:
+    - TAC.SEG
+    - TAC.CPAMON
+    rationale: Segmentation contains incidents; continuous posture monitoring maintains resilience.
+  - scenario_ref: SA.4
+    selected_tactics:
+    - TAC.MFA
+    - TAC.AC
+    - TAC.OPA
+    rationale: Strong identity + least privilege enforced as code protects confidential datasets.
+  traces: []
+  metrics: []
+  ground_truth: []
+  subjects: []
+  runs: []
+  measurements: []
+  hypotheses: []
+  test_results: []
+  qa_ids:
+  - QA.AUDIT
+  - QA.INTEGRITY
+  - QA.AVAIL
+  - QA.CONF
+  prin_ids:
+  - ZT.CMON
+  - ZT.LP
+  - ZT.EV
+  - ZT.AB
+  - ZT.MS
+  - ZT.CPA
+  - ZT.SI
+  scn_ids:
+  - SA.1
+  - SA.2
+  - SA.3
+  - SA.4
+  tac_ids:
+  - TAC.AUDITTRAIL
+  - TAC.NONREP
+  - TAC.MFA
+  - TAC.AC
+  - TAC.SEG
+  - TAC.ATREST
+  - TAC.MTLS
+  - TAC.OPA
+  - TAC.CPAMON
+  pol_vals:
+  - '+'
+  - '++'
+  - '-'
+  - '--'
+  invalid_asrs: []
+  invalid_influences: []
+  invalid_scn_qa: []
+  invalid_scn_principles: []
+  invalid_tactics_addresses: []
+  invalid_tactics_principles: []
+  invalid_candidates: []
+  invalid_decisions: []
+  decided_scenarios:
+  - SA.1
+  - SA.2
+  - SA.3
+  - SA.4
+  missing_decision: []
+  invalid_gt: []
+  subj_ids: []
+  runs_list: []
+  invalid_runs_subject: []
+  invalid_runs_scenario: []
+  invalid_runs_tactics: []
+  metric_ids: []
+  invalid_measurements: []
+  hyp_ids: []
+  invalid_tests: []

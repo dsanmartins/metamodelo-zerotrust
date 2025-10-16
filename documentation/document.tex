@@ -1,0 +1,140 @@
+% !TEX TS-program = pdflatex
+\documentclass[12pt,letterpaper]{article}
+
+% ==== Paquetes ====
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\geometry{margin=2.5cm}
+\setstretch{1.15}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue!60!black,
+	urlcolor=blue!60!black
+}
+
+\title{Metamodelo Conceptual para ZeroTrust}
+\author{Daniel San Martín}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Entidades del Metamodelo (Vista Conceptual)}
+	Este documento describe las entidades que componen el metamodelo conceptual propuesto para el proceso de diseño basado en los principios \textit{Zero Trust} (ZT-from-ASRs → Escenarios → Tácticas).  
+	Cada entidad se define según su propósito, rol semántico y relaciones principales con las demás.
+	
+	\subsection{QualityAttribute (Atributo de Calidad)}
+	\textbf{Propósito.} Representa una propiedad de calidad del sistema que debe alcanzarse o mantenerse (por ejemplo, Auditabilidad, Integridad, Disponibilidad, Confidencialidad).  
+	\textbf{Rol semántico.} Constituye la meta central que orienta la definición de escenarios y la selección de tácticas.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item Es \emph{especificado por} una entidad \textbf{ASR}.
+		\item Es \emph{impactado} (positiva o negativamente) por una \textbf{Influence}, generada por un principio ZT.
+		\item Se \emph{contextualiza} en uno o varios \textbf{Scenario}.
+		\item Es \emph{satisfecho o protegido} por una \textbf{SecurityTactic}.
+	\end{itemize}
+	
+	\subsection{ASR (Architecturally Significant Requirement)}
+	\textbf{Propósito.} Define un requerimiento arquitectónicamente significativo que refina o concreta un atributo de calidad.  
+	\textbf{Rol semántico.} Actúa como puente entre las necesidades de los interesados y los objetivos de calidad del sistema.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Especifica} un \textbf{QualityAttribute}.
+		\item \emph{Da origen a} uno o más \textbf{Scenario} donde el atributo de calidad se analiza o garantiza.
+	\end{itemize}
+	
+	\subsection{ZTPrinciple (Principio Zero Trust)}
+	\textbf{Propósito.} Representa una estrategia de seguridad fundamental (por ejemplo, Menor Privilegio, Monitoreo Continuo, Verificación Explícita, Asumir Compromiso).  
+	\textbf{Rol semántico.} Expresa la intención estratégica que guía las decisiones arquitectónicas.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Genera} una o más \textbf{Influence} sobre los atributos de calidad.
+		\item \emph{Se operacionaliza en} uno o varios \textbf{Scenario}.
+		\item \emph{Es implementado por} una o más \textbf{SecurityTactic}.
+	\end{itemize}
+	
+	\subsection{Influence (Influencia)}
+	\textbf{Propósito.} Representa la relación de contribución del modelo \textit{Softgoal Interdependency Graph} (SIG), expresando el efecto de un principio ZT sobre un atributo de calidad.  
+	\textbf{Rol semántico.} Indica que un principio \emph{impacta} o \emph{afecta} un atributo de calidad, especificando la polaridad del efecto (positivo o negativo).  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Es generada por} un \textbf{ZTPrinciple}.
+		\item \emph{Impacta} (positiva o negativamente) un \textbf{QualityAttribute}.
+	\end{itemize}
+	
+	\subsection{Scenario (Escenario)}
+	\textbf{Propósito.} Define una situación arquitectónica concreta donde un atributo de calidad se pone a prueba o se garantiza, considerando contexto, actores, recursos y respuesta esperada.  
+	\textbf{Rol semántico.} Representa la unidad operativa del análisis (hoja del árbol de utilidad) que conduce a la selección de tácticas.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Contextualiza} un \textbf{QualityAttribute}.
+		\item \emph{Se fundamenta en} uno o más \textbf{ZTPrinciple}.
+		\item \emph{Genera} \textbf{TacticCandidate}s mediante la extracción de palabras clave o reglas heurísticas.
+		\item \emph{Se implementa mediante} una \textbf{TacticDecision}.
+	\end{itemize}
+	
+	\subsection{SecurityTactic (Táctica de Seguridad)}
+	\textbf{Propósito.} Representa una decisión o mecanismo arquitectónico reutilizable que contribuye al cumplimiento de atributos de calidad y a la implementación de principios ZT (por ejemplo, Registro de Auditoría, Autenticación Multifactor, Segmentación de Red).  
+	\textbf{Rol semántico.} Constituye el medio concreto para materializar los principios y alcanzar los objetivos de calidad.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Implementa o materializa} uno o varios \textbf{ZTPrinciple}.
+		\item \emph{Satisface o protege} uno o varios \textbf{QualityAttribute}.
+		\item \emph{Es seleccionada por} una \textbf{TacticDecision}.
+		\item \emph{Es propuesta por} una \textbf{TacticCandidate}.
+	\end{itemize}
+	
+	\subsection{TacticCatalog (Catálogo de Tácticas)}
+	\textbf{Propósito.} Constituye la base de conocimiento reutilizable que contiene las tácticas de seguridad disponibles.  
+	\textbf{Rol semántico.} Fuente de descubrimiento y selección para las decisiones arquitectónicas.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Contiene} un conjunto de \textbf{SecurityTactic}.
+	\end{itemize}
+	
+	\subsection{TacticCandidate (Táctica Candidata)}
+	\textbf{Propósito.} Representa una coincidencia o propuesta de táctica encontrada durante la búsqueda automática o asistida a partir de un escenario.  
+	\textbf{Rol semántico.} Corresponde a una etapa exploratoria del proceso de diseño.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Se propone para} un \textbf{Scenario}.
+		\item \emph{Hace referencia a} una \textbf{SecurityTactic} del catálogo.
+	\end{itemize}
+	
+	\subsection{TacticDecision (Decisión Táctica)}
+	\textbf{Propósito.} Representa la consolidación final de tácticas seleccionadas para implementar un escenario arquitectónico específico.  
+	\textbf{Rol semántico.} Marca el compromiso de diseño que se traduce en artefactos arquitectónicos.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Implementa o responde a} un \textbf{Scenario}.
+		\item \emph{Selecciona o consolida} una o más \textbf{SecurityTactic}.
+	\end{itemize}
+	
+	\subsection{TraceLink (Enlace de Trazabilidad)}
+	\textbf{Propósito.} Mantiene la trazabilidad de extremo a extremo entre los artefactos generados a lo largo del proceso de diseño.  
+	\textbf{Rol semántico.} Permite preservar el razonamiento y la evidencia de cumplimiento de los objetivos de calidad.  
+	\textbf{Relaciones.}
+	\begin{itemize}[noitemsep]
+		\item \emph{Conecta} las entidades \textbf{ASR} $\rightarrow$ \textbf{Scenario} $\rightarrow$ \textbf{SecurityTactic} $\rightarrow$ \textbf{Artifact} (por ejemplo, IaC, política o código).
+	\end{itemize}
+	
+	\subsection{Conjunto de Evaluación (Opcional)}
+	\textbf{Propósito.} Permite medir y validar empíricamente la efectividad del proceso de selección de tácticas.  
+	\textbf{Entidades incluidas.}
+	\begin{itemize}[noitemsep]
+		\item \textbf{GroundTruth:} conjunto de tácticas correctas por escenario, validadas por expertos.
+		\item \textbf{Subject / SubjectRun:} participantes y sus elecciones de tácticas.
+		\item \textbf{MetricDef / Measurement:} métricas (precisión, exhaustividad, exactitud) y sus valores observados.
+		\item \textbf{Hypothesis / TestResult:} hipótesis estadísticas y resultados de contraste (por ejemplo, prueba de Mann--Whitney).
+	\end{itemize}
+	\textbf{Rol semántico.} Evalúa la efectividad del modelo de descubrimiento y selección de tácticas, proporcionando evidencia cuantitativa.
+	
+\end{document}
