@@ -1,0 +1,116 @@
+rules:
+  # === Identity and Access ===
+  TAC.MFA:
+    match:
+      function_names:
+        - login
+      file_pattern: app/main.py
+    inject:
+      import: from app.security_lib import require_mfa
+      decorator: '@require_mfa'
+      description: 'Apply Multi-Factor Authentication on user login or access to sensitive routes.'
+
+  TAC.SI:
+    match:
+      function_names:
+        - login
+      file_pattern: app/main.py
+    inject:
+      import: from app.security_lib import strong_identity
+      decorator: '@strong_identity'
+      description: 'Enforce phishing-resistant authentication (Strong Identity).'
+
+  TAC.AC:
+    match:
+      function_pattern: 'def '
+      file_pattern: app/main.py
+    inject:
+      import: from app.security_lib import access_control
+      decorator: '@access_control(policy="least_privilege")'
+      description: 'Restrict access to functions based on least privilege policy.'
+
+  # === Auditing and Integrity ===
+  TAC.AUDITTRAIL:
+    match:
+      function_pattern: 'def '
+      file_pattern: app/main.py
+    inject:
+      import: from app.audit import log_action
+      call: log_action(request)
+      position: start
+      description: 'Record every API call or transaction for auditability.'
+
+  TAC.NONREP:
+    match:
+      function_names:
+        - process_payment
+      file_pattern: app/main.py
+    inject:
+      import: from app.crypto import sign_event
+      call: sign_event(getattr(request, "user", None), payload)
+      position: before_commit
+      description: 'Digitally sign events or transactions for non-repudiation.'
+
+  # === Policy Enforcement ===
+  TAC.OPA:
+    match:
+      function_pattern: 'def '
+      file_pattern: app/main.py
+    inject:
+      import: from app.opa import check_policy_opa
+      decorator: '@check_policy_opa(policy="access.rego")'
+      description: 'Apply Open Policy Agent (OPA) rules for fine-grained access control.'
+
+  # === Data Protection ===
+  TAC.ATREST:
+    match:
+      function_names:
+        - save_to_db
+      file_pattern: app/main.py
+    inject:
+      import: from app.storage import encrypt_file
+      call: encrypt_file(data, key)
+      position: before_commit
+      description: 'Encrypt data before storage to ensure protection at rest.'
+
+  TAC.MTLS:
+    match:
+      file_pattern: server.yaml
+    inject:
+      note: 'Set require_client_cert: true and reference trusted CA bundle.'
+      description: 'Enable Mutual TLS for service-to-service authentication.'
+
+  # === Network and Posture ===
+  TAC.SEG:
+    match:
+      file_pattern: app/main.py
+    inject:
+      note: 'Apply router segmentation in API initialization (e.g., app.include_router(payments, prefix="/isolated/payments")).'
+      description: 'Implement network micro-segmentation to limit lateral movement.'
+
+  TAC.CPAMON:
+    match:
+      file_pattern: app/main.py
+    inject:
+      import: from app.monitor import check_system_posture
+      scheduler: add_job(check_system_posture, "interval", minutes=5)
+      description: 'Continuously assess system posture and detect configuration drift.'
+
+  TAC.CMON:
+    match:
+      file_pattern: app/main.py
+    inject:
+      import: from app.monitor import check_system_posture
+      call: send_to_observability_stack()
+      description: 'Aggregate security logs and telemetry for continuous monitoring.'
+
+  # === Governance and Compliance ===
+  TAC.LP:
+    match:
+      function_names:
+        - get_data
+      file_pattern: app/main.py
+    inject:
+      import: from app.security_lib import access_control
+      decorator: '@access_control(policy="least_privilege")'
+      description: 'Reinforce least privilege at data access layer.'
